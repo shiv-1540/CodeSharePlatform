@@ -15,6 +15,7 @@ import { Link, useNavigate } from "react-router-dom";
 import { AuthContext } from "../../context/AuthContext";
 import axios from "axios";
 import "./CreateProjectPage.css";
+const api = import.meta.env.VITE_API_URL;
 
 const CreateProjectPage = () => {
   const [projectName, setProjectName] = useState("");
@@ -59,7 +60,7 @@ const CreateProjectPage = () => {
     try {
       console.log('form data: ', formData);
       
-      await axios.post("http://localhost:3000/projectRoom/createProject", formData, {
+      await axios.post(`${api}/projectRoom/createProject`, formData, {
         headers: {
           'Content-Type': 'application/json',
           Authorization: `Bearer ${authData.token}`,
