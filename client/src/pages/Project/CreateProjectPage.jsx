@@ -15,6 +15,7 @@ import { Link, useNavigate } from "react-router-dom";
 import { AuthContext } from "../../context/AuthContext";
 import axios from "axios";
 import "./CreateProjectPage.css";
+const api = import.meta.env.VITE_API_URL;
 
 const CreateProjectPage = () => {
   const [projectName, setProjectName] = useState("");
