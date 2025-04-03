@@ -7,5 +7,5 @@ export const initSocket = async () => {
         timout: 10000,
         transports: ['websocket']
     };
-    return io('http://localhost:3000', option);
+    return io('https://codeshareplatform.onrender.com/', option);
 }
