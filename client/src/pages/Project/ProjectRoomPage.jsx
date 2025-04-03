@@ -12,6 +12,7 @@ import nofiles from '../../assets/no-files.png';
 import { toast } from 'react-hot-toast';
 import FileUploadModal from '../../components/UploadFilePage';
 import GroupChat from '../CodeRoom/ChatBox';
+const api = import.meta.env.VITE_API_URL;
 
 const ProjectRoomPage = () => {
   const navigate = useNavigate();
@@ -104,7 +105,7 @@ const ProjectRoomPage = () => {
   const deleteFile= async (fileId) => {
     try {
       const response = await axios.delete(
-        `http://localhost:3000/fileRoutes/deleteFile/${fileId}`
+        `${api}/fileRoutes/deleteFile/${fileId}`
       );
       console.log(response.data);
       toast.success("File deleted successfully");
@@ -148,7 +149,7 @@ const ProjectRoomPage = () => {
 
   const fetchCodeFiles = async () => {
     try {
-      const res = await axios.get(`http://localhost:3000/fileRoutes/getCodeFiles/${roomCode}`);
+      const res = await axios.get(`${api}/fileRoutes/getCodeFiles/${roomCode}`);
       setCodeFiles(res.data); // create state codeFiles = []
     } catch (err) {
       console.error(err);
@@ -157,7 +158,7 @@ const ProjectRoomPage = () => {
   useEffect(() => {
     const fetchCodeFiles = async () => {
       try {
-        const res = await axios.get(`http://localhost:3000/fileRoutes/getCodeFiles/${roomCode}`);
+        const res = await axios.get(`${api}/fileRoutes/getCodeFiles/${roomCode}`);
         setCodeFiles(res.data); // create state codeFiles = []
       } catch (err) {
         console.error(err);
@@ -169,7 +170,7 @@ const ProjectRoomPage = () => {
   const fetchFiles = async () => {
     try {
       const response = await axios.get(
-        `http://localhost:3000/fileRoutes/getRoomFiles/${roomCode}`
+        `${api}/fileRoutes/getRoomFiles/${roomCode}`
       );
       setFiles(response.data);
     } catch (error) {
@@ -184,7 +185,7 @@ const ProjectRoomPage = () => {
     const fetchFiles = async () => {
       try {
         const response = await axios.get(
-          `http://localhost:3000/fileRoutes/getRoomFiles/${roomCode}`
+          `${api}/fileRoutes/getRoomFiles/${roomCode}`
         );
         setFiles(response.data);
       } catch (error) {
@@ -216,7 +217,7 @@ const ProjectRoomPage = () => {
 
     axios
       .get(
-        `http://localhost:3000/projectRoom/getProjectRoomDetail/${roomCode}`,
+        `${api}/projectRoom/getProjectRoomDetail/${roomCode}`,
         {
           headers: { Authorization: `Bearer ${authData.token}` },
         }

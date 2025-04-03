@@ -25,8 +25,8 @@ const server = http.createServer(app);
 const {Server} = require('socket.io');
 const io = new Server(server, {
     cors: {
-      origin: "http://localhost:5173",
-      methods: ["GET", "POST"],
+      origin: "*",
+      methods: ["GET", "POST","PUT"],
     },
   });
 
@@ -148,16 +148,6 @@ app.post('/ask-ai', async (req, res) => {
     console.error('OpenRouter error:', error.response?.data || error.message);
     res.status(500).json({ error: 'Failed to fetch AI response' });
   }
-});
-
-// ✅ Default root route
-app.get('/', (req, res) => {
-  res.status(200).json({
-    status: 'success',
-    message: '🚀 Welcome to the CodeShare Backend API',
-    timestamp: new Date().toISOString(),
-    version: '1.0.0'
-  });
 });
 
 

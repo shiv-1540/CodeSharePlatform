@@ -15,7 +15,7 @@ import {
 } from 'react-router-dom';
 
 import AIHelpAssistant from './AIHelpAssistant.jsx';
-
+const api = import.meta.env.VITE_API_URL;
 
 const EditorPage = () => {
     const socketRef = useRef(null);
@@ -115,7 +115,7 @@ const EditorPage = () => {
       if (!fileName) return;
       
       try {
-        const res = await axios.post("http://localhost:3000/fileRoutes/saveCodeFile", {
+        const res = await axios.post(`${api}/fileRoutes/saveCodeFile`, {
           code: codeRef.current,
           fileName,
           language,      // from your code editor selection

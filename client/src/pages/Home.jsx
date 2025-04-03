@@ -13,6 +13,8 @@ import axios from "axios";
 import { AuthContext } from "../context/AuthContext"; // AuthContext import
 import defaultProfile from "../assets/ProfileImages/avtaar.jpg";
 import logo from "../../public/logo-white.png";
+import { toast } from "react-hot-toast";
+const api = import.meta.env.VITE_API_URL;
 
 const Home = () => {
   const navigate = useNavigate();
@@ -20,6 +22,20 @@ const Home = () => {
   const [userInfo, setUserInfo] = useState({});
   const [userProfilePic, setProfilePic] = useState(defaultProfile);
   const { authData, logout } = useContext(AuthContext);
+
+  const handleDeleteRoom = async (roomCode) => {
+    try {
+      const res = await axios.delete(`${api}/projectRoom/delete/${roomCode}`, {
+        headers: { Authorization: `Bearer ${authData.token}` },
+      });
+      alert(res.data.message);
+    
+    } catch (err) {
+      console.error("Delete failed:", err);
+      alert("Error deleting room");
+    }
+  };
+
 
   // Fetch project rooms when the component mounts
   useEffect(() => {
@@ -29,7 +45,7 @@ const Home = () => {
     }
 
     axios
-      .get("http://localhost:3000/projectRoom/getProjectRooms", {
+      .get(`${api}/projectRoom/getProjectRooms/${authData.username}`, {
         headers: { Authorization: `Bearer ${authData.token}` },
       })
       .then((response) => {
@@ -86,7 +102,7 @@ const Home = () => {
             <img src={userProfilePic} alt="profile-pic" />
           </div>
           <div className="profile-content">
-            <h1>@{userInfo.username}</h1>
+            <h1>@{authData.username}</h1>
             <p>{userInfo.email}</p>
           </div>
         </div>
@@ -117,7 +133,7 @@ const Home = () => {
       <section className="main-content">
         <div className="header-div">
           <h1>
-            Welcome Back, <span>{userInfo.name}</span>
+            Welcome Back, <span>{authData.username}</span>
           </h1>
           <div className="header-btn-div">
             <Button
@@ -172,11 +188,16 @@ const Home = () => {
             </Select>
           </div>
 
-          <div className="projects-card-box">
-            {projectRooms.map((room) => (
-              <ProjectCard key={room._id} room={room} /> // Pass room data to ProjectCard
-            ))}
-          </div>
+         <div className="projects-card-box">
+          {projectRooms.map((room) => (
+            <ProjectCard
+              key={room._id}
+              room={room}
+              onDeleteRequest={handleDeleteRoom} // 🔥 Connect to parent
+            />
+          ))}
+        </div>
+
         </div>
       </section>
     </main>

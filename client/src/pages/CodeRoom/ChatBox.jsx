@@ -1,17 +1,18 @@
 import { useEffect, useState, useRef } from 'react';
 import { io } from 'socket.io-client'; 
 import axios from 'axios';
+const api = import.meta.env.VITE_API_URL;
 
 export default function GroupChat({ username, roomCode }) {
      const [messages, setMessages] = useState([]);
     const [msg, setMsg] = useState(''); const socketRef = useRef(null); const bottomRef = useRef();
 
 useEffect(() => { // Connect and join room 
- socketRef.current = io('http://localhost:3000'); 
+ socketRef.current = io(api); 
  socketRef.current.emit('join-room', { roomCode, username });
 
 // Load previous messages
-axios.get(`http://localhost:3000/groupRoutes/chat/${roomCode}`).then((res) => {
+axios.get(`${api}/groupRoutes/chat/${roomCode}`).then((res) => {
   setMessages(res.data);
 });
 

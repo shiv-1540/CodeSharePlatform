@@ -5,6 +5,7 @@ import { Link, useNavigate } from "react-router-dom";
 import axios from "axios";
 import logo from '../../../public/logo-white.png';
 import toast from "react-hot-toast";
+const api = import.meta.env.VITE_API_URL;
 
 const RegistrationForm = () => {
   const [name, setName] = useState("");
@@ -43,7 +44,7 @@ const RegistrationForm = () => {
 
       axios
         .post(
-          "http://localhost:3000/userAuthen/registrationSubmission",
+          `${api}/userAuthen/registrationSubmission`,
           formData
         )
         .then((response) => {

@@ -6,6 +6,7 @@ import axios from 'axios';
 import { AuthContext } from '../../context/AuthContext'; // Import AuthContext
 import logo from '../../../public/logo-white.png';
 import { toast } from "react-hot-toast";
+const api = import.meta.env.VITE_API_URL;
 
 const LoginForm = () => {
   const [email, setEmail] = useState('');
@@ -27,7 +28,7 @@ const LoginForm = () => {
   useEffect(() => {
     if (isSubmitted) {
       const formData = { email, password };
-      axios.post('http://localhost:3000/userAuthen/loginSubmission', formData)
+      axios.post(`${api}/userAuthen/loginSubmission`, formData)
         .then(response => {
           if (response.data.token && response.data.id) {
             // Store both token and userId in the context

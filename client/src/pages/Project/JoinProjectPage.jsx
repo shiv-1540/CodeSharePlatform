@@ -11,6 +11,7 @@ import { ViewIcon, ViewOffIcon } from "@chakra-ui/icons";
 import { Link, useNavigate } from "react-router-dom";
 import axios from "axios";
 import { AuthContext } from "../../context/AuthContext";
+const api = import.meta.env.VITE_API_URL;
 
 const JoinProjectPage = () => {
   const [roomCode, setRoomCode] = useState("");
@@ -35,7 +36,7 @@ const JoinProjectPage = () => {
     try {
       // Change the method to 'POST' to match the server-side route
       const response = await axios.post(
-        "http://localhost:3000/projectRoom/joinProjectRoom",
+        `${api}/projectRoom/joinProjectRoom`,
         { roomCode, roomPassword },
         {
           headers: { Authorization: `Bearer ${authData.token}` },

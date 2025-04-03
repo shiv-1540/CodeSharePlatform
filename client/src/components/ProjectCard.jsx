@@ -9,19 +9,10 @@ const ProjectCard = ({ room }) => {
   // Accept room prop
   const [showModal, setShowModal] = useState(false);
   const [inputText, setInputText] = useState("");
-  const [isDeleteEnabled, setIsDeleteEnabled] = useState(false);
+  
 
   const navigate = useNavigate();
-  console.log()
-  const handleDeleteClick = () => {
-    setShowModal(true);
-  };
 
-  const handleCloseModal = () => {
-    setShowModal(false);
-    setInputText("");
-    setIsDeleteEnabled(false);
-  };
 
   const handleInputChange = (e) => {
     const value = e.target.value;
@@ -54,43 +45,11 @@ const ProjectCard = ({ room }) => {
           <button>
             <MdEditDocument />
           </button>
-          <button onClick={handleDeleteClick}>
+          <button >
             <AiFillDelete />
           </button>
         </div>
       </div>
-
-      {/* Modal for Delete Confirmation */}
-      {showModal && (
-        <div className="modal-overlay">
-          <div className="modal">
-            <h2>Are you sure you want to delete?</h2>
-            <p>
-              Please type <strong>"delete"</strong> to confirm.
-            </p>
-            <input
-              type="text"
-              value={inputText}
-              onChange={handleInputChange}
-              placeholder="Type 'delete' here..."
-            />
-            <div className="modal-btn-group">
-              <button onClick={handleCloseModal} className="cancel-btn">
-                Cancel
-              </button>
-              <button
-                onClick={handleDeleteConfirmation}
-                disabled={!isDeleteEnabled}
-                className={`delete-btn ${
-                  isDeleteEnabled ? "enabled" : "disabled"
-                }`}
-              >
-                Delete
-              </button>
-            </div>
-          </div>
-        </div>
-      )}
     </div>
   );
 };

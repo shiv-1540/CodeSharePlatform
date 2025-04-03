@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import axios from 'axios';
 import { Loader2 } from 'lucide-react';
+const api = import.meta.env.VITE_API_URL;
 
 const AIHelpAssistant = ({ selectedCode }) => {
   const [question, setQuestion] = useState('');
@@ -12,7 +13,7 @@ const AIHelpAssistant = ({ selectedCode }) => {
     setLoading(true);
     setResponse('');
     try {
-      const res = await axios.post('http://localhost:3000/ask-ai', {
+      const res = await axios.post(`${api}/ask-ai`, {
         code: selectedCode,
         question: question,
       });

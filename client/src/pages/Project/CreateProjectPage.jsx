@@ -59,7 +59,7 @@ const CreateProjectPage = () => {
     try {
       console.log('form data: ', formData);
       
-      await axios.post("http://localhost:3000/projectRoom/createProject", formData, {
+      await axios.post(`${api}/projectRoom/createProject`, formData, {
         headers: {
           'Content-Type': 'application/json',
           Authorization: `Bearer ${authData.token}`,

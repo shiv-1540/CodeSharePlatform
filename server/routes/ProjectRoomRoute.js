@@ -76,29 +76,41 @@ router.post('/createProject', jwtAuthMiddleware, async (req, res) => {
 
 
 // route to get projects created/joined by user
-router.get('/getProjectRooms', jwtAuthMiddleware, async (req, res) => {
-    const userId = req.user.id;
-    console.log(`User ID: ${userId}`);
-    
+router.get('/getProjectRooms/:username', jwtAuthMiddleware, async (req, res) => {
+    const username = req.params.username;
+  
+    console.log(`Requested username: ${username}`);
+  
     try {
-        const projectRooms = await ProjectRoomSchema.find({
-            members: { $elemMatch: { userId: userId } }
-        });
-
-        console.log('Project Rooms:', projectRooms);
-
-        if (!projectRooms.length) {
-            return res.status(404).json({ message: 'No project rooms found for this user.' });
-        }
-
-        const userInfo = await User.findOne({_id: userId});
-
-        res.status(200).json({projectRooms, userInfo});
+      // Step 1: Get the user ID from the username
+      const userInfo = await User.findOne({ username });
+  
+      if (!userInfo) {
+        return res.status(404).json({ message: 'User not found' });
+      }
+  
+      const userId = userInfo._id;
+      console.log("Resolved User ID:", userId);
+  
+      // Step 2: Find all project rooms where user is a member
+      const projectRooms = await ProjectRoomSchema.find({
+        members: { $elemMatch: { userId: userId } }
+      });
+  
+      console.log('Project Rooms:', projectRooms);
+  
+      if (!projectRooms.length) {
+        return res.status(404).json({ message: 'No project rooms found for this user.' });
+      }
+  
+      res.status(200).json({ projectRooms, userInfo });
+  
     } catch (err) {
-        console.error('Error fetching project rooms:', err);
-        res.status(500).json({ message: 'Internal Server Error', error: err.message });
+      console.error('Error fetching project rooms:', err);
+      res.status(500).json({ message: 'Internal Server Error', error: err.message });
     }
-});
+  });
+  
 
 
 // route to get detail information of any project room
@@ -173,53 +185,40 @@ router.post('/joinProjectRoom', jwtAuthMiddleware, async (req, res) => {
     }
 });
 
-// route to delete the project card
-router.delete("/deleteProjectRoom/:roomId", async (req, res) => {
-    const roomId = req.params.roomId;
-    console.log(`Room id: ${roomId}`);
+// DELETE /projectRoom/delete/:roomCode
+
+router.delete('/delete/:roomCode', jwtAuthMiddleware, async (req, res) => {
+    const { roomCode } = req.params;
+    const userId = req.user.id;
+  
     try {
-        // Find the project room to be deleted
-        const projectRoom = await ProjectRoomSchema.findById(roomId);
-        if (!projectRoom) {
-            return res.status(404).json({ message: "Project room not found." });
-        }
+      // Step 1: Find the room
+      const room = await ProjectRoomSchema.findOne({ roomCode });
   
-        // Gather user emails of all members in the project room
-        const memberUserIds = projectRoom.members.map((member) => member.userId);
-        const usersToUpdate = await User.find({
-            $or: [{ createdRooms: roomId }, { joinedRooms: roomId }],
-        });
+      if (!room) {
+        return res.status(404).json({ message: 'Project room not found' });
+      }
   
-        const userEmails = usersToUpdate.map((user) => user.email);
+      // Step 2: Check if the current user is the creator
+      const isCreator = room.members.some(
+        (member) => member.userId.toString() === userId && member.role === 'creator'
+      );
   
-        // Remove the project room reference from each user's createdRooms and joinedRooms
-        await User.updateMany(
-            { _id: { $in: memberUserIds } },
-            {
-                $pull: {
-                    createdRooms: roomId,
-                    joinedRooms: roomId,
-                },
-            }
-        );
+      if (!isCreator) {
+        return res.status(403).json({ message: 'You are not authorized to delete this project room.' });
+      }
   
-        // Delete the project room from the ProjectRoom collection
-        await ProjectRoomSchema.findByIdAndDelete(roomId);
+      // Step 3: Delete the room
+      await ProjectRoomSchema.deleteOne({ roomCode });
   
-        // Send deletion notifications to all members
-        await mailSetup.sendDeletionNotifications(userEmails);
+      res.status(200).json({ message: 'Project room deleted successfully.' });
   
-        // Respond with a success message and list of notified emails
-        res.status(200).json({
-            message: "Project room deleted successfully.",
-            notifiedEmails: userEmails,
-        });
-  
-    } catch (error) {
-        console.error("Error deleting project room:", error);
-        res.status(500).json({ message: "An error occurred while deleting the project room." });
+    } catch (err) {
+      console.error('Error deleting project room:', err);
+      res.status(500).json({ message: 'Internal Server Error', error: err.message });
     }
 });
+  
 
 
 

@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import axios from 'axios';
 import { toast } from 'react-hot-toast';
+const api = import.meta.env.VITE_API_URL;
 
 const FileUploadModal = ({ isOpen, onClose, roomCode, onFileUploaded }) => {
   const [file, setFile] = useState(null);
@@ -26,7 +27,7 @@ const FileUploadModal = ({ isOpen, onClose, roomCode, onFileUploaded }) => {
     formData.append('roomCode', roomCode);
 
     try {
-      await axios.post('http://localhost:3000/fileRoutes/uploadFile', formData, {
+      await axios.post(`${api}/fileRoutes/uploadFile`, formData, {
         headers: { 'Content-Type': 'multipart/form-data' },
       });
       toast.success('File uploaded successfully!');
