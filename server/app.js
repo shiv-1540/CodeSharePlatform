@@ -150,6 +150,16 @@ app.post('/ask-ai', async (req, res) => {
   }
 });
 
+// ✅ Default root route
+app.get('/', (req, res) => {
+  res.status(200).json({
+    status: 'success',
+    message: '🚀 Welcome to the CodeShare Backend API',
+    timestamp: new Date().toISOString(),
+    version: '1.0.0'
+  });
+});
+
 
 // app.post('/ask-ai', async (req, res) => {
 //   const { code, question } = req.body;
