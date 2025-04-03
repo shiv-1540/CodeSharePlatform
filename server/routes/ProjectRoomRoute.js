@@ -76,6 +76,32 @@ router.post('/createProject', jwtAuthMiddleware, async (req, res) => {
 
 
 // route to get projects created/joined by user
+router.get('/getProjectRooms', jwtAuthMiddleware, async (req, res) => {
+    const userId = req.user.id;
+    console.log(`User ID: ${userId}`);
+    
+    try {
+        const projectRooms = await ProjectRoomSchema.find({
+            members: { $elemMatch: { userId: userId } }
+        });
+
+        console.log('Project Rooms:', projectRooms);
+
+        if (!projectRooms.length) {
+            return res.status(404).json({ message: 'No project rooms found for this user.' });
+        }
+
+        const userInfo = await User.findOne({_id: userId});
+
+        res.status(200).json({projectRooms, userInfo});
+    } catch (err) {
+        console.error('Error fetching project rooms:', err);
+        res.status(500).json({ message: 'Internal Server Error', error: err.message });
+    }
+});
+
+
+// route to get projects created/joined by user
 router.get('/getProjectRooms/:username', jwtAuthMiddleware, async (req, res) => {
     const username = req.params.username;
   

@@ -25,11 +25,11 @@ const server = http.createServer(app);
 const {Server} = require('socket.io');
 const io = new Server(server, {
     cors: {
-      origin: "*",
+      origin: "http://localhost:5173",
       methods: ["GET", "POST","PUT"],
     },
   });
-
+  
 // socketio setup:
 // use to track which user got which socket id, so that each has different socket id 
 const userSocketMap = {};

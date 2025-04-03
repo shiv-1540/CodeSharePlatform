@@ -64,8 +64,8 @@
     display: flex;
     justify-content: space-between;
     align-items: center;
-    /* border: 2px solid yellow; */
-}
+    border: 2px solid yellow; 
+ }
 .main-content .header-btn-div{
     display: flex;
     gap: 0 0.8rem;
@@ -122,5 +122,13 @@
 
 .projects-card-box::-webkit-scrollbar {
   display: none;
-}
+} */
+
+#profile-container { min-height: 100vh; }
+
+#home-main-container { font-family: 'Inter', sans-serif; }
+
+#projects-card-box > div { transition: transform 0.2s ease; }
+
+#projects-card-box > div:hover { transform: scale(1.02); }
 

@@ -1,4 +1,4 @@
-import React, { useState, useContext } from "react";
+import  { useState, useContext } from "react";
 import {
   Input,
   Textarea,
@@ -15,7 +15,6 @@ import { Link, useNavigate } from "react-router-dom";
 import { AuthContext } from "../../context/AuthContext";
 import axios from "axios";
 import "./CreateProjectPage.css";
-const api = import.meta.env.VITE_API_URL;
 
 const CreateProjectPage = () => {
   const [projectName, setProjectName] = useState("");
@@ -60,7 +59,7 @@ const CreateProjectPage = () => {
     try {
       console.log('form data: ', formData);
       
-      await axios.post(`${api}/projectRoom/createProject`, formData, {
+      await axios.post("http://localhost:3000/projectRoom/createProject", formData, {
         headers: {
           'Content-Type': 'application/json',
           Authorization: `Bearer ${authData.token}`,
@@ -108,7 +107,7 @@ const CreateProjectPage = () => {
             />
           </FormControl>
           <FormControl isRequired>
-            <Select
+            <Select className="bg-slate-50"
               placeholder="Select Domain"
               name="projectDomain"
               onChange={(e) => setProjectDomain(e.target.value)}

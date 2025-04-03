@@ -29,28 +29,40 @@ const ProjectCard = ({ room }) => {
   };
 
   return (
-    <div className="projectCard">
-      <div className="project-card-content">
-        <h1>{room.title}</h1>
-        <p>{room.description}</p>
-      </div>
-      <div className="card-btn-group">
-        <button
-          className="project-btn enter-btn"
-          onClick={() => navigate(`/projectRoom/${room.roomCode}`)}
-        >
-          Enter
-        </button>
-        <div className="right-group">
-          <button>
-            <MdEditDocument />
-          </button>
-          <button >
-            <AiFillDelete />
-          </button>
+     <div className="bg-gray-800 p-5 rounded-lg shadow-md hover:shadow-lg transition duration-200 border border-gray-700 flex flex-col justify-between h-full"> 
+        {/* Title and Description */}
+         <div className="mb-7"> 
+            <h1 className="text-xl font-semibold text-white">{room.title}</h1> 
+            <p className="text-gray-400 text-sm mt-3 line-clamp-3">{room.description}</p>
+         </div>     
+        {/* Action Buttons */}
+        <div className="flex items-center justify-between mt-auto">
+            <button
+              onClick={() => navigate(`/projectRoom/${room.roomCode}`)}
+              className="bg-teal-600 hover:bg-teal-700 px-4 py-2 rounded text-sm text-white font-medium transition"
+            >
+              Enter
+            </button>
+      
+          <div className="flex items-center gap-2">
+            <button
+              onClick={() => alert('Edit coming soon!')}
+              className="p-2 rounded hover:bg-zinc-700 transition text-white"
+              title="Edit Project"
+            >
+               <MdEditDocument size={20} />
+            </button>
+            <button
+              onClick={() => onDeleteRequest(room._id)}
+              className="p-2 rounded hover:bg-red-600 transition text-white"
+              title="Delete Project"
+            >
+              <AiFillDelete size={20} />
+            </button>
+          </div>
         </div>
       </div>
-    </div>
+      
   );
 };
 

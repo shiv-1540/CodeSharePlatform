@@ -8,7 +8,7 @@ import { Input, InputGroup, InputLeftElement } from "@chakra-ui/react";
 import { IoSearch } from "react-icons/io5";
 import { Select } from "@chakra-ui/react";
 import ProjectCard from "../components/ProjectCard";
-import { useNavigate } from "react-router-dom";
+import {Link, useNavigate } from "react-router-dom";
 import axios from "axios";
 import { AuthContext } from "../context/AuthContext"; // AuthContext import
 import defaultProfile from "../assets/ProfileImages/avtaar.jpg";
@@ -36,7 +36,6 @@ const Home = () => {
     }
   };
 
-
   // Fetch project rooms when the component mounts
   useEffect(() => {
     if (!authData?.token) {
@@ -45,7 +44,7 @@ const Home = () => {
     }
 
     axios
-      .get(`${api}/projectRoom/getProjectRooms/${authData.username}`, {
+      .get(`${api}/projectRoom/getProjectRooms`, {
         headers: { Authorization: `Bearer ${authData.token}` },
       })
       .then((response) => {
@@ -70,136 +69,96 @@ const Home = () => {
       });
   }, [authData, navigate]);
 
+   const handleLogout=()=>{
+    logout();
+    navigate('/');
+    toast.success("Logged Out Sucessfully !")
+   }
    console.log("Hiii auth ka data:" ,authData);
   return (
-    <main className="home-main-container">
-      <aside className="profile-container">
-        {/* logo box */}
-        <div
-          className="logo-box"
-          style={{
-            display: "flex",
-            alignItems: "center",
-            gap: "0 0.6rem",
-            marginBottom: "1rem",
-          }}
-        >
-          <img
-            src={logo}
-            alt="logo-dark"
-            style={{
-              height: "3.5rem",
-              borderRight: "1px solid #eee",
-              paddingRight: "0.5rem",
-            }}
-          />
-          <p style={{ color: "#eee", fontSize: "1.3rem", fontWeight: "500" }}>
-            Code Share
-          </p>
-        </div>
-        <div style={{display:"flex", flexDirection:"column", gap:"1rem 0"}}>
-          <div className="profilePicBox">
-            <img src={userProfilePic} alt="profile-pic" />
-          </div>
-          <div className="profile-content">
-            <h1>@{authData.username}</h1>
-            <p>{userInfo.email}</p>
-          </div>
-        </div>
-
-        {/* Logout Button */}
-        <Button
-          rightIcon={<MdLogout />}
-          colorScheme="teal"
-          variant="solid"
-          padding="1.8rem 2.2rem"
-          fontSize="1.2rem"
-          onClick={() => {
-            logout(); // Call logout function to clear auth data
-            navigate("/"); // Navigate to login page
-            toast({
-              title: "Logged Out Successfully",
-              description: "Logout Out!",
-              status: "Success",
-              duration: 3000,
-              isClosable: true,
-              position: "top", // Set the position to top
-            });
-          }}
-        >
-          Logout
-        </Button>
-      </aside>
-      <section className="main-content">
-        <div className="header-div">
-          <h1>
-            Welcome Back, <span>{authData.username}</span>
-          </h1>
-          <div className="header-btn-div">
-            <Button
-              leftIcon={<IoIosCreate className="icon" />}
-              colorScheme="green"
-              size="md"
-              width="7rem"
-              onClick={() => {
-                navigate("/createProject");
-              }} // Navigate to create project
-            >
+    <main id="home-main-container" className="min-h-screen bg-gray-900 text-white flex flex-col md:flex-row"> 
+    {/* Sidebar Profile */} 
+      <aside id="profile-container" className="bg-gray-800 mx-20px w-full md:w-1/5 p-6 flex flex-col items-center border-r border-gray-700"> 
+      {/* Logo */}
+        <div className="flex items-center gap-3 mb-6">
+           <img src={logo} alt="logo-dark" className="h-12 border-r border-gray-500 pr-3" />
+           <p className="text-lg font-semibold text-gray-200">Code Share</p> </div>
+   
+    {/* Profile */}
+    <div className="flex flex-col items-center gap-4 mb-8">
+      <div className="w-24 h-24 rounded-full overflow-hidden border-4 border-teal-500">
+        <img src={userProfilePic} alt="profile" className="object-cover w-full h-full" />
+      </div>
+      <div className="text-center">
+        <h1 className="text-lg font-semibold">@{authData.username}</h1>
+        <p className="text-sm text-gray-400">{userInfo.email}</p>
+      </div>
+    </div>
+    
+    {/* Logout Button */}
+    <Button
+      rightIcon={<MdLogout />}
+      colorScheme="teal"
+      size="md"
+      className="w-full"
+      onClick={handleLogout}
+    >
+      Logout
+    </Button>
+    </aside>
+    {/* Main Content */}
+    
+    <section id="main-content" className="flex-1 p-6">
+       {/* Welcome Header */} 
+       <div className="flex flex-col md:flex-row justify-between items-start md:items-center mb-6">
+         <h1 className="text-2xl font-bold mb-2 md:mb-0"> Welcome Back, <span className="text-teal-400">{authData.username}</span> </h1>
+         <div className="flex gap-4"> 
+            <Button leftIcon={<IoIosCreate />} colorScheme="green" onClick={() => navigate('/createProject')} > 
               Create
-            </Button>
-            <Button
-              leftIcon={<IoMdAddCircle className="icon" />}
-              colorScheme="red"
-              size="md"
-              width="7rem"
-              onClick={() => {
-                navigate("/joinProject");
-              }} // Navigate to join project
-            >
-              Join
-            </Button>
+           </Button>
+           <Button leftIcon={<IoMdAddCircle />} colorScheme="red" onClick={() => navigate('/joinProject')} > 
+              Join 
+            </Button> 
           </div>
-        </div>
+       </div>
 
-        <div className="projects-card-main-container">
-          <div className="filter-box">
-            <InputGroup size="md" mb={4} className="searchbarbox" width="20rem">
-              <InputLeftElement pointerEvents="none">
-                <IoSearch className="searchIcon" />
-              </InputLeftElement>
-              <Input
-                type="text"
-                placeholder="Search Project"
-                aria-label="Search projects"
-                className="search-bar"
-                background="white"
-              />
-            </InputGroup>
-
-            <Select
-              placeholder="Select Domain"
-              background="white"
-              maxWidth="12rem"
-            >
-              <option value="web development">Web Development</option>
-              <option value="java development">Java Development</option>
-              <option value="data science">Data Science</option>
-              <option value="ai & ml">AI & ML</option>
-            </Select>
-          </div>
-
-         <div className="projects-card-box">
-          {projectRooms.map((room) => (
-            <ProjectCard
-              key={room._id}
-              room={room}
-              onDeleteRequest={handleDeleteRoom} // 🔥 Connect to parent
-            />
-          ))}
-        </div>
-
-        </div>
-      </section>
+    {/* Filters */}
+    <div className="flex flex-col md:flex-row items-start md:items-center justify-between gap-4 mb-6">
+      <InputGroup size="md" className="w-full md:w-1/3">
+        <InputLeftElement pointerEvents="none">
+          <IoSearch className="text-gray-400" />
+        </InputLeftElement>
+        <Input
+          type="text"
+          placeholder="Search Project"
+          aria-label="Search projects"
+          className="bg-white text-black rounded"
+        />
+      </InputGroup>
+    
+      <Select
+        placeholder="Select Domain"
+        className="w-full md:w-1/6 bg-black text-white rounded"
+      >
+        <option value="web development">Web Development</option>
+        <option value="java development">Java Development</option>
+        <option value="data science">Data Science</option>
+        <option value="ai & ml">AI & ML</option>
+      </Select>
+    </div>
+    
+    {/* Projects Grid */}
+    <div id="projects-card-box" className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+      {projectRooms.map((room) => (
+        <ProjectCard
+          key={room._id}
+          room={room}
+          onDeleteRequest={handleDeleteRoom}
+        />
+      ))}
+    </div>
+    </section> 
+    
     </main>
   );
 };
