@@ -1,6 +1,6 @@
 const io = require("socket.io")(server, {
   cors: {
-    origin: "https://code-share-platform.vercel.app", // Update this to match your frontend's origin
+    origin:[ "https://code-share-platform.vercel.app/","https://codeshareplatform.onrender.com/"], // Update this to match your frontend's origin
     methods: ["GET", "POST"],
   },
 });
