@@ -1,140 +1,46 @@
-AWSTemplateFormatVersion: '2010-09-09'
-Description: CodeShare App - EC2 + IAM + Security Group + CodeDeploy Setup
+version: 0.2
 
-Parameters:
-  KeyPairName:
-    Description: Existing EC2 KeyPair for SSH access
-    Type: AWS::EC2::KeyPair::KeyName
+phases:
+  install:
+    runtime-versions:
+      nodejs: 18
+    commands:
+      # Install backend dependencies
+      - echo Installing server dependencies...
+      - cd server
+      - npm install
+      - cd ..
 
-  InstanceType:
-    Description: EC2 instance type
-    Type: String
-    Default: t2.micro
-    AllowedValues:
-      - t2.micro
-      - t3.micro
+      # Install frontend dependencies
+      - echo Installing client dependencies...
+      - cd client
+      - npm install
+      - cd ..
 
-  AmiId:
-    Description: Amazon Linux 2 AMI ID
-    Type: AWS::SSM::Parameter::Value<AWS::EC2::Image::Id>
-    Default: /aws/service/ami-amazon-linux-latest/amzn2-ami-hvm-x86_64-gp2
+  pre_build:
+    commands:
+      # Build frontend
+      - echo Building React frontend...
+      - cd client
+      - npm run build
+      - cd ..
 
-  SshLocation:
-    Description: IP range allowed for SSH (CIDR)
-    Type: String
-    Default: 0.0.0.0/0
+  build:
+    commands:
+      - echo Preparing deployment artifacts...
+      - mkdir -p build/server
+      - mkdir -p build/client
+      - cp -r server/* build/server/
+      - cp -r client/dist/* build/client/
+      - echo Build phase complete.
 
-Resources:
-  CodeShareEC2Role:
-    Type: AWS::IAM::Role
-    Properties:
-      AssumeRolePolicyDocument:
-        Version: '2012-10-17'
-        Statement:
-          - Effect: Allow
-            Principal:
-              Service: ec2.amazonaws.com
-            Action: sts:AssumeRole
-      ManagedPolicyArns:
-        - arn:aws:iam::aws:policy/AmazonSSMManagedInstanceCore
-        - arn:aws:iam::aws:policy/AmazonS3ReadOnlyAccess
-      Policies:
-        - PolicyName: SSMParameterStoreReadOnly
-          PolicyDocument:
-            Version: '2012-10-17'
-            Statement:
-              - Effect: Allow
-                Action: ssm:GetParameters
-                Resource:
-                  - !Sub 'arn:aws:ssm:${AWS::Region}:${AWS::AccountId}:parameter/codeshare/*'
+  post_build:
+    commands:
+      - echo Packaging artifacts for CodeDeploy...
+      - zip -r build-output.zip build appspec.yml scripts/
+      - echo Post build phase complete.
 
-  CodeShareInstanceProfile:
-    Type: AWS::IAM::InstanceProfile
-    Properties:
-      Roles:
-        - !Ref CodeShareEC2Role
-
-  CodeShareSG:
-    Type: AWS::EC2::SecurityGroup
-    Properties:
-      GroupDescription: Allow SSH, HTTP, CodeShare backend & frontend ports
-      VpcId: vpc-00660e114bf00fe54  # 🔴 Replace with your VPC ID
-      SecurityGroupIngress:
-        - IpProtocol: tcp
-          FromPort: 22
-          ToPort: 22
-          CidrIp: !Ref SshLocation
-        - IpProtocol: tcp
-          FromPort: 5000
-          ToPort: 5000
-          CidrIp: 0.0.0.0/0
-        - IpProtocol: tcp
-          FromPort: 3000
-          ToPort: 3000
-          CidrIp: 0.0.0.0/0
-
-  CodeShareInstance:
-    Type: AWS::EC2::Instance
-    Properties:
-      InstanceType: !Ref InstanceType
-      KeyName: !Ref KeyPairName
-      ImageId: !Ref AmiId
-      IamInstanceProfile: !Ref CodeShareInstanceProfile
-      NetworkInterfaces:
-        - AssociatePublicIpAddress: true
-          DeviceIndex: '0'
-          GroupSet:
-            - !Ref CodeShareSG
-          SubnetId: subnet-0f6d849c344ea2b69 # 🔴 Replace with your public subnet ID
-      Tags:
-        - Key: Name
-          Value: CodeShareServer
-        - Key: Deploy
-          Value: codeshare-app
-      UserData:
-        Fn::Base64: !Sub |
-          #!/bin/bash
-          yum update -y
-          yum install ruby wget -y
-
-          cd /home/ec2-user
-          wget https://aws-codedeploy-${AWS::Region}.s3.${AWS::Region}.amazonaws.com/latest/install
-          chmod +x ./install
-          ./install auto
-
-          sudo -u ec2-user -i <<'EOF'
-          curl -o- https://raw.githubusercontent.com/nvm-sh/nvm/v0.39.7/install.sh | bash
-          export NVM_DIR="/home/ec2-user/.nvm"
-          [ -s "$NVM_DIR/nvm.sh" ] && \. "$NVM_DIR/nvm.sh"
-          nvm install 16
-          nvm use 16
-          nvm alias default 16
-          npm install -g pm2
-          EOF
-
-          curl -o- https://raw.githubusercontent.com/nvm-sh/nvm/v0.39.7/install.sh | bash
-          export NVM_DIR="/root/.nvm"
-          [ -s "$NVM_DIR/nvm.sh" ] && \. "$NVM_DIR/nvm.sh"
-          nvm install 16
-          nvm use 16
-          nvm alias default 16
-          npm install -g pm2
-
-          curl "https://awscli.amazonaws.com/awscli-exe-linux-x86_64.zip" -o "awscliv2.zip"
-          unzip awscliv2.zip
-          ./aws/install
-          rm -rf aws awscliv2.zip
-
-          service codedeploy-agent start
-          chkconfig codedeploy-agent on
-
-Outputs:
-  InstanceId:
-    Description: EC2 Instance ID
-    Value: !Ref CodeShareInstance
-  PublicIp:
-    Description: Public IP address
-    Value: !GetAtt CodeShareInstance.PublicIp
-  PublicDns:
-    Description: Public DNS name
-    Value: !GetAtt CodeShareInstance.PublicDnsName
+artifacts:
+  files:
+    - build-output.zip
+  discard-paths: yes
