@@ -1,5 +1,7 @@
 #!/bin/bash
-echo "Running app_stop.sh"
+export NVM_DIR="/root/.nvm"
+[ -s "$NVM_DIR/nvm.sh" ] && \. "$NVM_DIR/nvm.sh"
 
-# Stop all PM2 apps
-pm2 stop all || true
+echo "Stopping Node application if running..."
+pm2 stop codeshare03 || true
+pm2 delete codeshare03 || true

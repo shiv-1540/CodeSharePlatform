@@ -1,10 +1,29 @@
 #!/bin/bash
-echo "Running before_install.sh"
+set -e
 
-# Stop any existing app processes
-pm2 stop all || true
-pm2 delete all || true
+echo "Installing Node.js..."
 
-# Clean previous deployment
-rm -rf /home/ec2-user/codeshare
-mkdir -p /home/ec2-user/codeshare
+# Update package lists
+yum update -y
+
+# Install the Node.js 16.x repository
+curl -sL https://rpm.nodesource.com/setup_16.x | bash -
+
+# Install Node.js and npm
+yum install -y nodejs
+
+# Create application directory if it doesn't exist
+mkdir -p /var/www/codeshare03
+
+# Install PM2 globally
+npm install -g pm2
+
+# Check versions
+echo "Node.js version:"
+node -v
+echo "npm version:"
+npm -v
+echo "PM2 version:"
+pm2 -v
+
+echo "Node.js installation completed"
