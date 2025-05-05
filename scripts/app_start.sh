@@ -13,9 +13,6 @@ echo "Fetching environment variables from AWS Parameter Store..."
 
 # Use parameter names EXACTLY as they appear in Parameter Store
 MONGO_URI_PARAM="/codeshare-app/prod/mongodb-uri"
-# GMAIL_USER_PARAM="/mern-todo-app/gmail-username"
-# GMAIL_PASS_PARAM="/mern-todo-app/gmail-password"
-# JWT_SECRET_PARAM="/mern-todo-app/jwt-secret"
 ACCESS_KEY_PARAM='/codeshare-app/prod/AWS_ACCESS_KEY'
 SECRET_ACCESS_KEY_PARAM='/codeshare-app/prod/secret_acess_key'
 PORT_PARAM="/codeshare-app/port"

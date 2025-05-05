@@ -15,11 +15,15 @@ phases:
   build:
     commands:
       - echo Building React frontend...
-      - npm run build # Assumes 'build' script in frontend/package.json
+      - npm run build
+      - echo Current directory:
+      - pwd
+      - echo Files after build:
+      - ls -al
       - echo Copying frontend build to backend public directory...
-      # Adjust paths as needed!
       - mkdir -p ../server/public
-      - cp -r build/* ../server/public/
+      - cp -r dist/* ../server/public/
+
   post_build:
     commands:
       - echo Build completed on `date`
