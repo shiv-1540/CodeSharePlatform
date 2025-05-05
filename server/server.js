@@ -5,7 +5,6 @@ const path = require('path');
 const cors = require('cors');
 require('dotenv').config();
 const port = process.env.PORT || 3000;
-const  OpenAI  = require('openai');
 const axios = require('axios');
 
 require('dotenv').config();
